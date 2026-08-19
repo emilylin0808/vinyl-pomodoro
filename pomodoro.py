@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-
+from PIL import Image, ImageTk
 
 class PomodoroApp(tk.Tk):
     def __init__(self):
@@ -29,6 +29,11 @@ class PomodoroApp(tk.Tk):
 
         frm = ttk.Frame(self, padding=pad)
         frm.grid(row=0, column=0)
+
+        # Vinyl image
+        self.vinyl_image = tk.PhotoImage(file="vinyl.png").subsample(3, 3)
+        self.vinyl_label = ttk.Label(frm, image=self.vinyl_image)
+        self.vinyl_label.grid(row=0, column=5, rowspan=5, padx=(20, 0))
 
         # Mode label
         self.mode_label = ttk.Label(frm, text=self.mode, font=(None, 14, "bold"))
