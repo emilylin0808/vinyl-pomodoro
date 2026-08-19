@@ -6,7 +6,7 @@ class PomodoroApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Pomodoro Timer")
-        self.resizable(False, False)
+        self.resizable(True, True)
 
         # Defaults (seconds for quick testing)
         self.work_default = 25
@@ -25,62 +25,112 @@ class PomodoroApp(tk.Tk):
         self._reset_state()
 
     def _build_ui(self):
-        pad = 8
+        # Window
+        self.geometry("900x750")
+        self.configure(bg="#B78C6E")
 
-        frm = ttk.Frame(self, padding=pad)
-        frm.grid(row=0, column=0)
+        # Main container
+        main_frame = tk.Frame(
+            self,
+            bg="#B78C6E"
+        )
+        main_frame.pack(fill="both", expand=True)
+
+        # Title
+        self.title_label = tk.Label(
+            main_frame,
+            text="VINYL",
+            font=("Georgia", 24, "bold"),
+            bg="#B78C6E",
+            fg="#2E2925"
+        )
+        self.title_label.pack(pady=(30, 5))
+
+        # Mode
+        self.mode_label = tk.Label(
+            main_frame,
+            text=self.mode.upper(),
+            font=("Helvetica", 14),
+            bg="#B78C6E",
+            fg="#2E2925"
+        )
+        self.mode_label.pack()
 
         # Vinyl image
-        self.vinyl_image = tk.PhotoImage(file="vinyl.png").subsample(3, 3)
-        self.vinyl_label = ttk.Label(frm, image=self.vinyl_image)
-        self.vinyl_label.grid(row=0, column=5, rowspan=5, padx=(20, 0))
+        vinyl = Image.open("vinyl.png")
+        vinyl = vinyl.resize((250, 250))
 
-        # Mode label
-        self.mode_label = ttk.Label(frm, text=self.mode, font=(None, 14, "bold"))
-        self.mode_label.grid(row=0, column=0, columnspan=3, pady=(0, 6))
+        self.vinyl_image = ImageTk.PhotoImage(vinyl)
 
-        # Timer display
+        self.vinyl_label = tk.Label(
+            main_frame,
+            image=self.vinyl_image,
+            bg="#B78C6E"
+        )
+        self.vinyl_label.pack(pady=15)
+
+        # Timer
         self.timer_var = tk.StringVar(value="00:00")
-        self.timer_label = ttk.Label(frm, textvariable=self.timer_var, font=(None, 36))
-        self.timer_label.grid(row=1, column=0, columnspan=3, pady=(0, 6))
 
-        # Duration controls
-        ttk.Label(frm, text="Work (s):").grid(row=2, column=0, sticky="e")
-        self.work_spin = ttk.Spinbox(frm, from_=1, to=3600, textvariable=self.work_seconds, width=6)
-        self.work_spin.grid(row=2, column=1, sticky="w")
-
-        self.work_minus_btn = ttk.Button(frm, text="-5", command=lambda: self.adjust_duration("work", -5))
-        self.work_minus_btn.grid(row=2, column=2, padx=(8, 2))
-
-        self.work_plus_btn = ttk.Button(frm, text="+5", command=lambda: self.adjust_duration("work", 5))
-        self.work_plus_btn.grid(row=2, column=3, padx=(2, 8))
-
-        ttk.Label(frm, text="Break (s):").grid(row=3, column=0, sticky="e")
-        self.break_spin = ttk.Spinbox(frm, from_=1, to=3600, textvariable=self.break_seconds, width=6)
-        self.break_spin.grid(row=3, column=1, sticky="w")
-
-        self.break_minus_btn = ttk.Button(frm, text="-5", command=lambda: self.adjust_duration("break", -5))
-        self.break_minus_btn.grid(row=3, column=2, padx=(8, 2))
-
-        self.break_plus_btn = ttk.Button(frm, text="+5", command=lambda: self.adjust_duration("break", 5))
-        self.break_plus_btn.grid(row=3, column=3, padx=(2, 8))
+        self.timer_label = tk.Label(
+            main_frame,
+            textvariable=self.timer_var,
+            font=("Helvetica", 48),
+            bg="#B78C6E",
+            fg="#2E2925"
+        )
+        self.timer_label.pack()
 
         # Session counter
-        self.session_var = tk.StringVar(value=f"Sessions: {self.sessions_completed}")
-        ttk.Label(frm, textvariable=self.session_var).grid(row=2, column=4, rowspan=2, padx=(12, 0))
+        self.session_var = tk.StringVar(
+            value=f"Session {self.sessions_completed}"
+        )
+
+        self.session_label = tk.Label(
+            main_frame,
+            textvariable=self.session_var,
+            font=("Helvetica", 12),
+            bg="#B78C6E",
+            fg="#2E2925"
+        )
+        self.session_label.pack(pady=5)
 
         # Buttons
-        btn_frame = ttk.Frame(frm)
-        btn_frame.grid(row=4, column=0, columnspan=5, pady=(8, 0))
+        button_frame = tk.Frame(
+            main_frame,
+            bg="#B78C6E"
+        )
+        button_frame.pack(pady=15)
 
-        self.start_btn = ttk.Button(btn_frame, text="Start", command=self.start)
-        self.start_btn.grid(row=0, column=0, padx=4)
+        self.start_btn = tk.Button(
+            button_frame,
+            text="START",
+            command=self.start,
+            font=("Helvetica", 12, "bold"),
+            padx=25,
+            pady=10
+        )
+        self.start_btn.grid(row=0, column=0, padx=5)
 
-        self.pause_btn = ttk.Button(btn_frame, text="Pause", command=self.pause)
-        self.pause_btn.grid(row=0, column=1, padx=4)
+        self.pause_btn = tk.Button(
+            button_frame,
+            text="PAUSE",
+            command=self.pause,
+            font=("Helvetica", 12, "bold"),
+            padx=25,
+            pady=10
+        )
+        self.pause_btn.grid(row=0, column=1, padx=5)
 
-        self.reset_btn = ttk.Button(btn_frame, text="Reset", command=self.reset)
-        self.reset_btn.grid(row=0, column=2, padx=4)
+        self.reset_btn = tk.Button(
+            button_frame,
+            text="RESET",
+            command=self.reset,
+            font=("Helvetica", 12, "bold"),
+            padx=25,
+            pady=10
+        )
+        self.reset_btn.grid(row=0, column=2, padx=5)
 
     def adjust_duration(self, kind, delta):
         if kind == "work":
@@ -117,7 +167,7 @@ class PomodoroApp(tk.Tk):
     def _update_display(self):
         mins, secs = divmod(int(self.remaining), 60)
         self.timer_var.set(f"{mins:02d}:{secs:02d}")
-        self.mode_label.config(text=self.mode)
+        self.mode_label.config(text=self.mode.upper())
         self.session_var.set(f"Sessions: {self.sessions_completed}")
 
     def _tick(self):
